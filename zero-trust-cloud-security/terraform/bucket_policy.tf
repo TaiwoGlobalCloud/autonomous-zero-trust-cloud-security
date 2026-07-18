@@ -9,18 +9,18 @@ resource "aws_s3_bucket_policy" "zero_trust_bucket_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "AllowLambdaReadIncoming"
-        Effect   = "Allow"
+        Sid       = "AllowLambdaReadIncoming"
+        Effect    = "Allow"
         Principal = { AWS = aws_iam_role.lambda_role.arn }
-        Action   = ["s3:GetObject"]
-        Resource = "${aws_s3_bucket.zero_trust_lambda_bucket.arn}/incoming/*"
+        Action    = ["s3:GetObject"]
+        Resource  = "${aws_s3_bucket.zero_trust_lambda_bucket.arn}/incoming/*"
       },
       {
-        Sid      = "AllowLambdaWriteAlerts"
-        Effect   = "Allow"
+        Sid       = "AllowLambdaWriteAlerts"
+        Effect    = "Allow"
         Principal = { AWS = aws_iam_role.lambda_role.arn }
-        Action   = ["s3:PutObject"]
-        Resource = "${aws_s3_bucket.zero_trust_lambda_bucket.arn}/alerts/*"
+        Action    = ["s3:PutObject"]
+        Resource  = "${aws_s3_bucket.zero_trust_lambda_bucket.arn}/alerts/*"
       }
     ]
   })
