@@ -81,12 +81,12 @@ resource "aws_route_table_association" "private_assoc" {
 # Security Group (Zero Trust baseline)
 ###############################
 resource "aws_security_group" "private_sg" {
-  name        = "ZeroTrust-Private-SG"
+  name = "ZeroTrust-Private-SG"
 
   # ✅ IMPORTANT: revert to original to avoid SG replacement/destruction
   description = "Security group for private subnet (no internet egress)"
 
-  vpc_id      = aws_vpc.zero_trust_vpc.id
+  vpc_id = aws_vpc.zero_trust_vpc.id
 
   # Allow only internal VPC traffic (tight baseline)
   ingress {

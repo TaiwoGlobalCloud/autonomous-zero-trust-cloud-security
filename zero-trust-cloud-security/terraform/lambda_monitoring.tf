@@ -7,8 +7,8 @@ resource "aws_lambda_function" "vpc_flow_monitor" {
   runtime = "python3.11"
 
   # Terraform expects this zip to exist in the terraform/ folder
-  filename         = "lambda_monitoring.zip"
-  source_code_hash = filebase64sha256("lambda_monitoring.zip")
+  filename         = data.archive_file.monitoring_lambda_zip.output_path
+  source_code_hash = data.archive_file.monitoring_lambda_zip.output_base64sha256
 
   environment {
     variables = {

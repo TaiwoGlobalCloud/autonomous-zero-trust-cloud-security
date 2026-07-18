@@ -2,7 +2,7 @@
 # S3 Bucket for Lambda Storage
 ###############################
 resource "aws_s3_bucket" "zero_trust_lambda_bucket" {
-  # must be globally unique across ALL AWS accounts
+  # Must be globally unique across ALL AWS accounts
   bucket = "zero-trust-lambda-bucket-unique123"
 
   tags = {
@@ -11,7 +11,9 @@ resource "aws_s3_bucket" "zero_trust_lambda_bucket" {
   }
 }
 
-# Block all public access (recommended; Zero Trust-friendly)
+###############################
+# Block Public Access
+###############################
 resource "aws_s3_bucket_public_access_block" "zero_trust_lambda_bucket_pab" {
   bucket = aws_s3_bucket.zero_trust_lambda_bucket.id
 
@@ -42,7 +44,7 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 ###############################
-# IAM Policy for Lambda (Least Privilege)
+# IAM Policy (Least Privilege)
 ###############################
 resource "aws_iam_role_policy" "lambda_policy" {
   name = "ZeroTrustLambdaPolicy"
@@ -51,7 +53,8 @@ resource "aws_iam_role_policy" "lambda_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      # --- Read only from incoming/ ---
+
+      # Read only from incoming/
       {
         Sid    = "ReadIncomingOnly"
         Effect = "Allow"
@@ -61,7 +64,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Resource = "${aws_s3_bucket.zero_trust_lambda_bucket.arn}/incoming/*"
       },
 
-      # --- Write only to alerts/ ---
+      # Write only to alerts/
       {
         Sid    = "WriteAlertsOnly"
         Effect = "Allow"
@@ -71,7 +74,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Resource = "${aws_s3_bucket.zero_trust_lambda_bucket.arn}/alerts/*"
       },
 
-      # --- Optional: allow listing the bucket but only for these prefixes ---
+      # List bucket only for required prefixes
       {
         Sid    = "ListBucketRestrictedPrefixes"
         Effect = "Allow"
@@ -79,6 +82,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "s3:ListBucket"
         ]
         Resource = aws_s3_bucket.zero_trust_lambda_bucket.arn
+
         Condition = {
           StringLike = {
             "s3:prefix" = [
@@ -89,7 +93,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
         }
       },
 
-      # --- CloudWatch Logs ---
+      # CloudWatch Logs
       {
         Sid    = "CloudWatchLogs"
         Effect = "Allow"
@@ -105,22 +109,23 @@ resource "aws_iam_role_policy" "lambda_policy" {
 }
 
 ###############################
-# Lambda Function (Autonomous Security Placeholder)
+# Lambda Function
 ###############################
 resource "aws_lambda_function" "zero_trust_lambda" {
+
   function_name = "zero_trust_anomaly_lambda"
-  role          = aws_iam_role.lambda_role.arn
 
-  # Your zip contains lambda_function.py with def lambda_handler(...)
-  handler = "lambda_function.lambda_handler"
+  role = aws_iam_role.lambda_role.arn
+
   runtime = "python3.11"
+  handler = "lambda_function.lambda_handler"
 
-  # ✅ Improvement: avoid 3-second timeouts + give more CPU
   timeout     = 30
   memory_size = 256
 
-  filename         = "lambda_function.zip" # must exist in terraform/
-  source_code_hash = filebase64sha256("lambda_function.zip")
+  # Archive created automatically by archive.tf
+  filename         = data.archive_file.zero_trust_lambda_zip.output_path
+  source_code_hash = data.archive_file.zero_trust_lambda_zip.output_base64sha256
 
   environment {
     variables = {
@@ -140,7 +145,7 @@ resource "aws_lambda_function" "zero_trust_lambda" {
 }
 
 ###############################
-# Lambda Outputs
+# Outputs
 ###############################
 output "lambda_function_name" {
   value = aws_lambda_function.zero_trust_lambda.function_name
