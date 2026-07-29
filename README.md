@@ -179,7 +179,6 @@ The architecture has been intentionally designed to support future enhancements,
 The framework follows a **Zero Trust, event-driven cloud security architecture** in which infrastructure is provisioned using **Terraform**, cloud storage events trigger automated processing through **AWS Lambda**, and structured security telemetry is generated to support auditing, compliance, and future AI-assisted analytics.
 
 The architecture emphasizes secure-by-design infrastructure, least-privilege identity management, continuous monitoring, and infrastructure reproducibility.
-
 ```mermaid
 flowchart TB
 
@@ -200,7 +199,7 @@ flowchart TB
 
         CW["Amazon CloudWatch"]
 
-        ALERT["Structured JSON Security Alerts"]
+        ALERT["Structured JSON<br/>Security Alerts"]
 
         COMP["Compliance & Audit"]
 
@@ -224,11 +223,13 @@ flowchart TB
     ALERT --> COMP
 
     COMP --> AI
+
+    click GH "https://github.com/TaiwoGlobalCloud/autonomous-zero-trust-cloud-security" "GitHub Repository"
 ```
 
-> **Note**
->
-> The current implementation demonstrates secure infrastructure provisioning, event-driven monitoring, and structured security telemetry generation. Components labeled **Future AI Analytics** represent planned enhancements and are not part of the current implementation.
+**Note**
+
+The current implementation demonstrates secure infrastructure provisioning, event-driven monitoring, and structured security telemetry generation. Components labeled **Future AI Analytics** represent planned enhancements and are **not** part of the current implementation.ntation.
 
 ---
 
